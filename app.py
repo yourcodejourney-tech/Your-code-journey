@@ -1,22 +1,31 @@
-from flask import Flask, request, render_template
+from flask import Flask, render_template, request
+from datetime import datetime
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route("/")
 def home():
-    return render_template("form.html")
+    return render_template("index.html")
 
-@app.route('/submit', methods=['POST'])
+@app.route("/enroll")
+def enroll():
+    return render_template("enroll.html")
+
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
+@app.route("/submit", methods=["POST"])
 def submit():
-    name = request.form['name']
-    email = request.form['email']
-    topic = request.form['topic']
-    return f"""
-    <h2>Thank You {name}!</h2>
-    <p>We received your email: {email}</p>
-    <p>Your Interest Topic: {topic}</p>
-    <a href="/">Go Back</a>
-    """
+    name = request.form.get("name")
+    email = request.form.get("email")
+    time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    # Save data into file
+    with open("users.txt", "a") as f:
+        f.write(f"Name: {name} | Email: {email} | Time: {time}\n")
+
+    return render_template("thankyou.html", name=name)
+
+if __name__ == "__main__":
+    app.run(debug=True)
